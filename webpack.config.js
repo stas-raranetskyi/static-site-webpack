@@ -27,12 +27,21 @@ const config = {
     output: {
         filename: './js/bundle.js'
     },
+    devServer: {
+        static: {
+          directory: path.join(__dirname, 'public'),
+          watch: true,
+        },
+        port: 3000,
+    },
     devtool: 'source-map',
     mode: 'production',
     optimization: {
         minimizer: [
             new TerserPlugin({
-                sourceMap: true,
+                terserOptions: {
+                    sourceMap: true,
+                },
                 extractComments: true
             })
         ]
@@ -57,20 +66,21 @@ const config = {
                 {
                     loader: 'postcss-loader',
                     options: {
-                        ident: 'postcss',
-                        sourceMap: true,
-                        plugins: () => [
-                            require('cssnano')({
-                            preset: [
-                                'default',
-                                {
-                                discardComments: {
-                                    removeAll: true
-                                }
-                                }
+                        postcssOptions: {
+                            sourceMap: true,
+                            plugins: () => [
+                                require('cssnano')({
+                                    preset: [
+                                        'default',
+                                        {
+                                        discardComments: {
+                                            removeAll: true
+                                        }
+                                        }
+                                    ]
+                                })
                             ]
-                            })
-                        ]
+                        }
                     }
                 },
                 {
@@ -92,16 +102,18 @@ const config = {
         new MiniCssExtractPlugin({
             filename: './css/style.bundle.css'
         }),
-        new CopyWebpackPlugin([
-            {
-                from: './src/fonts',
-                to: './fonts'
-            },
-            {
-                from: './src/img',
-                to: './img'
-            },
-        ])
+        new CopyWebpackPlugin({
+            patterns: [
+                {
+                    from: './src/fonts',
+                    to: './fonts'
+                },
+                {
+                    from: './src/img',
+                    to: './img'
+                },
+            ]
+        })
     ].concat(htmlPlugins)
 };
 
